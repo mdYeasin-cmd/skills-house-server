@@ -9,6 +9,10 @@
     "dev": "nodemon src/index.js",
     "db:create": "npx sequelize-cli db:create",
     "db:migrate": "npx sequelize-cli db:migrate",
+    "db:migrate-refresh": "npx sequelize-cli db:migrate:undo && npx sequelize-cli db:migrate",
+    "db:seed": "npx sequelize-cli db:seed:all",
+    "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
+    "db:recreate": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

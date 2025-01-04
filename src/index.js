@@ -1,5 +1,5 @@
 import app from "./app.js";
-import "./db/db.js";
+import "./db/index.js";
 
 const hostname = process.env.HOST || "127.0.0.1";
 const port = process.env.PORT || 5000;
