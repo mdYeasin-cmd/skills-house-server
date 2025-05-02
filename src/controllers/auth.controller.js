@@ -2,6 +2,7 @@ import AuthService from "../services/auth.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import httpStatus from "http-status";
 import sendResponse from "../utils/sendResponse.js";
+import { validationResult } from "express-validator";
 
 const singupUser = asyncHandler(async (req, res) => {
     const userData = req.body;
@@ -30,7 +31,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.body.refreshToken;
+    const refreshToken = req.cookies.refreshToken;
 
     const result = await AuthService.refreshToken(refreshToken);
 
