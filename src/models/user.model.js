@@ -34,20 +34,9 @@ const User = sequelize.define(
         },
         photo: {
             type: DataTypes.STRING,
-            validate: {
-                notEmpty: {
-                    msg: "Photo cannot be empty."
-                },
-            }
         },
         phone: {
             type: DataTypes.STRING,
-            validate: {
-                notEmpty: {
-                    msg: "Phone cannot be empty."
-                },
-            }
-
         },
         password: {
             type: DataTypes.STRING,
@@ -93,8 +82,16 @@ const User = sequelize.define(
     },
     {
         paranoid: true,
-        underscored: true
+        underscored: true,
+
     }
 );
+
+User.prototype.toJSON = function () {
+    const values = { ...this.get() };
+    delete values.password;
+    delete values.is_deleted;
+    return values;
+};
 
 export default User;
