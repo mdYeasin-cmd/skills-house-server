@@ -8,8 +8,6 @@ import validateAllowedFields from "../../middlewares/validateAllowedFields.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/signup", AuthController.singupUser);
-
 authRouter.post(
     "/login",
     validateAllowedFields(["email", "password"]),

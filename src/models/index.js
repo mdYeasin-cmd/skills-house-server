@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 import process from "process";
-import Sequelize from "sequelize";
-import configImport from "../config/config.js";
-import appConfig from "../../config/index.js";
+import { Sequelize, DataTypes } from "sequelize";
+import configImport from "../db/config/config.js";
+import appConfig from "../config/index.js";
 
 const basename = path.basename(import.meta.url);
 const env = appConfig.node_env;
@@ -24,7 +24,7 @@ try {
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 try {
-  fs.readdirSync(__dirname)
+  const modelFiles = fs.readdirSync(__dirname)
     .filter((file) => {
       return (
         file.indexOf(".") !== 0 &&
@@ -33,22 +33,40 @@ try {
         file.indexOf(".test.js") === -1
       );
     })
-    .forEach(async (file) => {
-      const model = (await import(path.join(__dirname, file))).default(sequelize, Sequelize.DataTypes);
-      db[model.name] = model;
-      console.log(`Loaded model: ${model.name}`);
-    });
+
+  const modelLoaders = [];
+
+  modelFiles.forEach((file) => {
+    modelLoaders.push(
+      (async () => {
+        try {
+          const model = await import(`./${file}`);
+          const namedModel = model.default(sequelize, DataTypes);
+          db[namedModel.name] = namedModel;
+          console.log("✅ Model Name: ", namedModel.name);
+        } catch (err) {
+          console.error(`❌ Failed to load model from file: ${file}`, err.message);
+        }
+      })()
+    );
+  });
+
+  await Promise.all(modelLoaders);
+
+  for (const modelName of Object.keys(db)) {
+    if (db[modelName].associate) {
+      try {
+        db[modelName].associate(db);
+      } catch (err) {
+        console.error(`❌ Failed to associate model: ${modelName}`, err.message);
+      }
+    }
+  }
+
+  db.sequelize = sequelize;
+  db.Sequelize = Sequelize;
 } catch (error) {
   console.error("Error loading models:", error);
 }
-
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
 
 export default db;

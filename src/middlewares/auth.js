@@ -1,7 +1,7 @@
 import config from "../config/index.js";
-import User from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js"
 import { verifyJwtToken } from "../utils/verifyJwtToken.js";
+import db from "../models/index.js";
 
 const auth = (...requiredRoles) => {
     return asyncHandler(async (req, res, next) => {
@@ -15,7 +15,7 @@ const auth = (...requiredRoles) => {
 
         const { id, role } = decoded;
 
-        const user = await User.findOne({
+        const user = await db.users.findOne({
             where: {
                 id: id,
             }

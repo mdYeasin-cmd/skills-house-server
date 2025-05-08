@@ -2,7 +2,7 @@ import { UnexpectedFieldError } from "../errors/UnexpectedFieldError.js";
 
 const validateAllowedFields = (allowedFields = []) => {
     return (req, res, next) => {
-        const sources = ["body", "query", "cookies", "params"];
+        const sources = ["body", "query", "params"];
         const unexpectedFields = [];
 
         for (const source of sources) {

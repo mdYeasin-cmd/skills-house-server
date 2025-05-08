@@ -2,20 +2,6 @@ import AuthService from "../services/auth.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import httpStatus from "http-status";
 import sendResponse from "../utils/sendResponse.js";
-import { validationResult } from "express-validator";
-
-const singupUser = asyncHandler(async (req, res) => {
-    const userData = req.body;
-
-    const result = await AuthService.singupUserIntoDB(userData);
-
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Signup successfully.",
-        data: result
-    });
-});
 
 const loginUser = asyncHandler(async (req, res) => {
     const userData = req.body;
@@ -71,10 +57,10 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-    const data = req.body;
-    const token = req.query.token;
+    const newPassword = req.body.password;
+    const token = req.body.token;
 
-    const result = await AuthService.resetPassword(data, token);
+    const result = await AuthService.resetPassword(newPassword, token);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -85,7 +71,6 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const AuthController = {
-    singupUser,
     loginUser,
     refreshToken,
     changePassword,

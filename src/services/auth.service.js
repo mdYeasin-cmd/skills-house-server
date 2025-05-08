@@ -1,35 +1,11 @@
-import UserRoles from "../constants/roles.js";
-import User from "../models/user.model.js";
 import { generateJwtToken } from "../utils/generateJwtToken.js";
 import config from "../config/index.js";
 import { verifyJwtToken } from "../utils/verifyJwtToken.js";
 import { generateHashedPassword, comparePassword } from "../utils/passwordUtil.js";
-
-
-const singupUserIntoDB = async (data) => {
-    const isUserExist = await User.findOne({
-        where: {
-            email: data.email
-        }
-    });
-
-    if (isUserExist) {
-        throw new Error("User already exist.");
-    }
-
-    const hashedPassword = await generateHashedPassword(data.password);
-
-    data.password = hashedPassword;
-    data.role = UserRoles.STUDENT;
-    data.is_active = true;
-
-    const user = await User.create(data);
-
-    return user;
-}
+import db from "../models/index.js";
 
 const loginUserIntoDB = async (data) => {
-    const user = await User.findOne({
+    const user = await db.users.findOne({
         where: {
             email: data.email,
         }
@@ -81,7 +57,7 @@ const loginUserIntoDB = async (data) => {
 const refreshToken = async (refreshToken) => {
     const verifiedUser = verifyJwtToken(refreshToken, config.jwt_refresh_token_secret);
 
-    const user = await User.findOne({
+    const user = await db.users.findOne({
         where: {
             id: verifiedUser.id
         }
@@ -120,7 +96,7 @@ const refreshToken = async (refreshToken) => {
 const changePassword = async (data, userPayload) => {
     const { id, role } = userPayload;
 
-    const user = await User.findOne({
+    const user = await db.users.findOne({
         where: {
             id: id,
         }
@@ -146,7 +122,7 @@ const changePassword = async (data, userPayload) => {
 
     const hashedPassword = await generateHashedPassword(data.newPassword);
 
-    await User.update({
+    await db.users.update({
         password: hashedPassword,
     }, {
         where: {
@@ -159,7 +135,7 @@ const changePassword = async (data, userPayload) => {
 }
 
 const forgotPassword = async (email) => {
-    const user = await User.findOne({
+    const user = await db.users.findOne({
         where: {
             email: email,
         }
@@ -197,10 +173,16 @@ const forgotPassword = async (email) => {
     // TODO: Send email to user.
 }
 
-const resetPassword = async (data, token) => {
-    const user = await User.findOne({
+const resetPassword = async (newPassword, token) => {
+    const decoded = verifyJwtToken(token, config.jwt_reset_password_secret);
+
+    const { id } = decoded;
+
+    console.log(decoded, "Decoded.");
+
+    const user = await db.users.findOne({
         where: {
-            email: data.email,
+            id: id,
         }
     });
 
@@ -216,19 +198,20 @@ const resetPassword = async (data, token) => {
         throw new Error("User is not active.");
     }
 
-    const hashedPassword = await generateHashedPassword(data.password);
+    const hashedPassword = await generateHashedPassword(newPassword);
 
-    await User.update({
+    await db.users.update({
         password: hashedPassword,
     }, {
         where: {
             id: user.id,
         }
     });
+
+    return null;
 }
 
 const AuthService = {
-    singupUserIntoDB,
     loginUserIntoDB,
     refreshToken,
     changePassword,
