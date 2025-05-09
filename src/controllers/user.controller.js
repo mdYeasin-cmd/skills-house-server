@@ -30,7 +30,9 @@ const applyAsInstructor = asyncHandler(async (req, res) => {
 });
 
 const createAdmin = asyncHandler(async (req, res) => {
-    const result = await UserService.createAdminIntoDB();
+    const adminData = req.body;
+
+    const result = await UserService.createAdminIntoDB(adminData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -41,7 +43,9 @@ const createAdmin = asyncHandler(async (req, res) => {
 });
 
 const createModerator = asyncHandler(async (req, res) => {
-    const result = await UserService.createModeratorIntoDB();
+    const moderatorData = req.body;
+
+    const result = await UserService.createModeratorIntoDB(moderatorData);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,

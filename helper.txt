@@ -1,0 +1,5 @@
+- migration file generator
+npx sequelize-cli migration:generate --name <file_name>
+
+- seed to db
+npx sequelize db:seed --seed my_seeder_file.js

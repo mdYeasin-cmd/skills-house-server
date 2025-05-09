@@ -20,10 +20,10 @@ export default (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            teaching_topics: {
-                type: DataTypes.JSON,
-                allowNull: false,
-            },
+            // teaching_topics: {
+            //     type: DataTypes.JSON,
+            //     allowNull: false,
+            // },
             experience: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
@@ -39,7 +39,6 @@ export default (sequelize, DataTypes) => {
             },
             verified_by: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
                 references: {
                     model: "users",
                     key: "id"
